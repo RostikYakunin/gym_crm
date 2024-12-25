@@ -32,6 +32,7 @@ dependencies {
 
     // Logger
     implementation 'org.slf4j:slf4j-api:1.7.32'
+    implementation 'ch.qos.logback:logback-classic:1.4.11'
 
     // Testing
     testImplementation 'org.springframework:spring-test:6.0.12'

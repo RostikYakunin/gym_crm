@@ -6,6 +6,7 @@ import com.crm_module.users.trainer.Trainer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @PropertySource("classpath:application.properties")
 @Import(AppConfig.class)
+@Slf4j
 public class DataInitializer {
     @Value("${data.file.trainee_data}")
     private String traineeDataFilePath;
@@ -37,9 +39,17 @@ public class DataInitializer {
     @PostConstruct
     public void initializeData() {
         try {
+            log.debug("TraineeDataBase`s initialization started ...");
             initializeTraineeData();
+            log.info("TraineeDataBase`s initialization successfully completed");
+
+            log.debug("TrainerDataBase`s initialization started ...");
             initializeTrainerData();
+            log.info("TrainerDataBase`s initialization successfully completed");
+
+            log.debug("TrainingDataBase`s initialization started ...");
             initializeTrainingData();
+            log.info("TrainingDataBase`s initialization successfully completed");
         } catch (Exception e) {
             throw new RuntimeException("Something went wrong with file deserialization", e);
         }
