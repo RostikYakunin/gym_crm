@@ -1,8 +1,8 @@
 package com.crm_module;
 
-import com.crm_module.training.TrainingService;
-import com.crm_module.users.trainee.TraineeService;
-import com.crm_module.users.trainer.TrainerService;
+import com.crm_module.services.trainee_service.TraineeService;
+import com.crm_module.services.trainer_service.TrainerService;
+import com.crm_module.services.training_service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

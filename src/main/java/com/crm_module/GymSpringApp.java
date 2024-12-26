@@ -1,9 +1,10 @@
 package com.crm_module;
 
-import com.crm_module.app_config.AppConfig;
-import com.crm_module.training.Training;
-import com.crm_module.users.trainee.Trainee;
-import com.crm_module.users.trainer.Trainer;
+import com.crm_module.config.AppConfig;
+import com.crm_module.models.training.Training;
+import com.crm_module.models.users.impl.Trainee;
+import com.crm_module.models.users.impl.Trainer;
+import com.crm_module.repositories.trainee_repo.TraineeRepo;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -16,6 +17,9 @@ public class GymSpringApp {
         Map<Long, Trainee> traineeDataBase = context.getBean("traineeDataBase", HashMap.class);
         Map<Long, Trainer> trainerDataBase = context.getBean("trainerDataBase", HashMap.class);
         Map<Long, Training> trainingDataBase = context.getBean("trainingDataBase", HashMap.class);
+
+        TraineeRepo trainingRepoImpl = context.getBean("traineeRepoImpl", TraineeRepo.class);
+        System.out.println(trainingRepoImpl.findById(1));
 
         System.out.println("Trainees: " + traineeDataBase);
         System.out.println("Trainers: " + trainerDataBase);
