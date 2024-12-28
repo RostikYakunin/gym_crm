@@ -41,7 +41,7 @@ public class TrainerRepoImpl implements TrainerRepo {
         trainerDataBase.remove(id);
 
         log.debug("Trainer with id=" + id + " was successfully removed");
-        return trainerDataBase.containsKey(id);
+        return !trainerDataBase.containsKey(id);
     }
 
     @Override

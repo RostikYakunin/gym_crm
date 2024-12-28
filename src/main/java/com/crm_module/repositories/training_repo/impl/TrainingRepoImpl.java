@@ -39,7 +39,7 @@ public class TrainingRepoImpl implements TrainingRepo {
         trainingDataBase.remove(id);
 
         log.debug("Training with id=" + id + " was successfully removed");
-        return trainingDataBase.containsKey(id);
+        return !trainingDataBase.containsKey(id);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class TraineeRepoImpl implements TraineeRepo {
         traineeDataBase.remove(id);
 
         log.debug("Trainee with id=" + id + " was successfully removed");
-        return traineeDataBase.containsKey(id);
+        return !traineeDataBase.containsKey(id);
     }
 
     @Override
