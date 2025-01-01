@@ -1,0 +1,194 @@
+package com.crm_module.repositories.impl;
+
+import com.crm_module.UnitTestBase;
+import com.crm_module.models.users.Trainer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class TrainerRepoImplTest extends UnitTestBase {
+    @Mock
+    private Map<Long, Trainer> mockDatabase;
+
+    @InjectMocks
+    private TrainerRepoImpl trainerRepo;
+
+    private Trainer testTrainer;
+
+    @BeforeEach
+    void setUp() {
+        testTrainer = Trainer.builder()
+                .userId(1L)
+                .username("testTrainer")
+                .build();
+    }
+
+    @AfterEach
+    void tearDown() {
+        testTrainer = null;
+    }
+
+    @Test
+    @DisplayName("generateId should generate ids sequentially")
+    void generateId_shouldReturnSequentialIds() {
+        // Given
+        long firstExpectedId = 1;
+        long secondExpectedId = 2;
+        long thirdExpectedId = 3;
+
+        // When
+        long firstGeneratedId = trainerRepo.generateId();
+        long secondGeneratedId = trainerRepo.generateId();
+        long thirdGeneratedId = trainerRepo.generateId();
+
+        // Then
+        assertEquals(firstExpectedId, firstGeneratedId);
+        assertEquals(secondExpectedId, secondGeneratedId);
+        assertEquals(thirdExpectedId, thirdGeneratedId);
+    }
+
+    @Test
+    @DisplayName("findById should return trainer when exists")
+    void findById_ShouldReturnTrainer_WhenExists() {
+        // Given
+        when(mockDatabase.get(anyLong())).thenReturn(testTrainer);
+
+        // When
+        var result = trainerRepo.findById(1L);
+
+        // Then
+        assertTrue(result.isPresent());
+        assertEquals(testTrainer, result.get());
+        verify(mockDatabase, times(1)).get(idArgumentCaptor.capture());
+    }
+
+    @Test
+    @DisplayName("findById should return empty optional when trainer does not exist")
+    void findById_ShouldReturnEmptyOptional_WhenNotExists() {
+        // Given
+        when(mockDatabase.get(anyLong())).thenReturn(null);
+
+        // When
+        var result = trainerRepo.findById(testTrainer.getUserId());
+
+        // Then
+        assertFalse(result.isPresent());
+        verify(mockDatabase, times(1)).get(testTrainer.getUserId());
+    }
+
+    @Test
+    @DisplayName("save should save the trainer")
+    void save_ShouldSaveTrainer() {
+        // Given
+        when(mockDatabase.put(anyLong(), any(Trainer.class))).thenReturn(null);
+
+        // When
+        var result = trainerRepo.save(testTrainer);
+
+        // Then
+        assertNull(result);
+        verify(mockDatabase, times(1)).put(
+                idArgumentCaptor.capture(),
+                trainerArgumentCaptor.capture()
+        );
+    }
+
+    @Test
+    @DisplayName("update should update the trainer")
+    void update_ShouldUpdateTrainer() {
+        // Given
+        when(mockDatabase.put(anyLong(), any(Trainer.class))).thenReturn(testTrainer);
+
+        // When
+        var result = trainerRepo.update(testTrainer);
+
+        // Then
+        assertEquals(testTrainer, result);
+        verify(mockDatabase, times(1)).put(
+                idArgumentCaptor.capture(),
+                trainerArgumentCaptor.capture()
+        );
+    }
+
+    @Test
+    @DisplayName("deleteById should remove trainer and return true when successful")
+    void deleteById_ShouldRemoveTrainerAndReturnTrue_WhenSuccessful() {
+        // Given
+        when(mockDatabase.containsKey(anyLong())).thenReturn(false);
+
+        // When
+        var result = trainerRepo.deleteById(testTrainer.getUserId());
+
+        // Then
+        assertTrue(result);
+        verify(mockDatabase, times(1)).remove(idArgumentCaptor.capture());
+        verify(mockDatabase, times(1)).containsKey(idArgumentCaptor.capture());
+    }
+
+    @Test
+    @DisplayName("isExistsById should return true when trainer exists")
+    void isExistsById_ShouldReturnTrue_WhenTrainerExists() {
+        // Given
+        when(mockDatabase.containsKey(anyLong())).thenReturn(true);
+
+        // When
+        var result = trainerRepo.isExistsById(testTrainer.getUserId());
+
+        // Then
+        assertTrue(result);
+        verify(mockDatabase, times(1)).containsKey(idArgumentCaptor.capture());
+    }
+
+    @Test
+    @DisplayName("isExistsById should return false when trainer does not exist")
+    void isExistsById_ShouldReturnFalse_WhenTrainerNotExists() {
+        // Given
+        when(mockDatabase.containsKey(anyLong())).thenReturn(false);
+
+        // When
+        var result = trainerRepo.isExistsById(testTrainer.getUserId());
+
+        // Then
+        assertFalse(result);
+        verify(mockDatabase, times(1)).containsKey(idArgumentCaptor.capture());
+    }
+
+    @Test
+    @DisplayName("isUserNameExists should return true when username exists")
+    void isUserNameExists_ShouldReturnTrue_WhenUsernameExists() {
+        // Given
+        when(mockDatabase.values()).thenReturn(List.of(testTrainer));
+
+        // When
+        var result = trainerRepo.isUserNameExists(testTrainer.getUsername());
+
+        // Then
+        assertTrue(result);
+        verify(mockDatabase, times(1)).values();
+    }
+
+    @Test
+    @DisplayName("isUserNameExists should return false when username does not exist")
+    void isUserNameExists_ShouldReturnFalse_WhenUsernameNotExists() {
+        // Given
+        when(mockDatabase.values()).thenReturn(Collections.emptyList());
+
+        // When
+        var result = trainerRepo.isUserNameExists(testTrainer.getUsername());
+
+        // Then
+        assertFalse(result);
+        verify(mockDatabase, times(1)).values();
+    }
+
+}

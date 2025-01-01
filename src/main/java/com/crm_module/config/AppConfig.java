@@ -1,8 +1,8 @@
 package com.crm_module.config;
 
 import com.crm_module.models.training.Training;
-import com.crm_module.models.users.impl.Trainee;
-import com.crm_module.models.users.impl.Trainer;
+import com.crm_module.models.users.Trainee;
+import com.crm_module.models.users.Trainer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

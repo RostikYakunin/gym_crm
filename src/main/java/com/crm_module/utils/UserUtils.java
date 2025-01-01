@@ -16,14 +16,14 @@ public class UserUtils {
             User user,
             Function<String, Boolean> usernameExistsChecker
     ) {
-        log.debug("Stated creating unique username... ");
+        log.info("Stated creating unique username... ");
 
         var baseUsername = user.getFirstName() + USERNAME_SEPARATOR + user.getLastName();
         var uniqueUsername = baseUsername;
         var counter = 1;
-        log.debug("Base username was created... ");
 
         while (usernameExistsChecker.apply(uniqueUsername)) {
+            log.info("Username=" + uniqueUsername + " already exists, starting generating new username... ");
             uniqueUsername = baseUsername + counter;
             counter++;
         }
@@ -33,7 +33,7 @@ public class UserUtils {
     }
 
     public static String generatePassword() {
-        log.debug("Stated generating password... ");
+        log.info("Stated generating password... ");
         RandomStringGenerator generator = new RandomStringGenerator.Builder()
                 .withinRange('0', 'z')
                 .build();

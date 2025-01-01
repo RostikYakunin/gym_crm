@@ -37,6 +37,10 @@ dependencies {
     // Common libraries
     implementation 'org.apache.commons:commons-text:1.10.0'
 
+    // Dto mapper Mapstruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
     // Testing
     testImplementation 'org.springframework:spring-test:6.0.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
