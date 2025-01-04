@@ -1,47 +1,52 @@
 package com.crm_module.init;
 
-import com.crm_module.UnitTestBase;
-import com.crm_module.models.training.Training;
-import com.crm_module.models.users.Trainee;
-import com.crm_module.models.users.Trainer;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.crm_module.config.AppConfig;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
-class DataInitializerTest extends UnitTestBase {
-    @Mock
-    private ObjectMapper objectMapper;
-
-    @Mock
-    private Map<Long, Trainee> traineeDataBase;
-
-    @Mock
-    private Map<Long, Trainer> trainerDataBase;
-
-    @Mock
-    private Map<Long, Training> trainingDataBase;
-
-    @InjectMocks
+class DataInitializerTest {
     private DataInitializer dataInitializer;
 
+    @BeforeEach
+    void init() {
+        var context = new AnnotationConfigApplicationContext(AppConfig.class);
+        dataInitializer = context.getBean("dataInitializer", DataInitializer.class);
+    }
+
+    @AfterEach
+    void destroy() {
+        dataInitializer = null;
+    }
+
     @Test
-    @DisplayName("Should throw exception when file not found")
-    void initializeData_shouldThrowExceptionWhenFileNotFound() throws Exception {
+    @DisplayName("Should not throw exception while entities initialization")
+    void initializeData_shouldNotThrowException_WhileInitializationFiles() {
         // Given
-        ReflectionTestUtils.setField(dataInitializer, "traineeDataFilePath", "mock/path/to/trainee_data.json");
-        when(objectMapper.readValue(any(File.class), eq(Trainee[].class))).thenThrow(FileNotFoundException.class);
+        ReflectionTestUtils.setField(dataInitializer, "traineeDataFilePath", "src/main/resources/init/trainee_data.json");
+        ReflectionTestUtils.setField(dataInitializer, "trainerDataFilePath", "src/main/resources/init/trainer_data.json");
+        ReflectionTestUtils.setField(dataInitializer, "trainingDataFilePath", "src/main/resources/init/training_data.json");
+
+        // When - Then
+        assertDoesNotThrow(
+                dataInitializer::initializeData,
+                "Something went wrong with file deserialization"
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw exception while entities initialization")
+    void initializeData_shouldThrowException_WhileInitializationFiles() {
+        // Given
+        ReflectionTestUtils.setField(dataInitializer, "traineeDataFilePath", "src/main/resources/init/trainee_data.json");
+        ReflectionTestUtils.setField(dataInitializer, "trainerDataFilePath", "src/main/resources/init/trainer_data.json");
+        ReflectionTestUtils.setField(dataInitializer, "trainingDataFilePath", "wrong/pass/resources/init/training_data.json");
 
         // When - Then
         assertThrows(

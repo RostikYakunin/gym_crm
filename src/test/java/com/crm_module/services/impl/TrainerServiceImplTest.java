@@ -59,21 +59,6 @@ class TrainerServiceImplTest extends UnitTestBase {
     }
 
     @Test
-    @DisplayName("findById should throw exception when trainer does not exist")
-    void findById_ShouldThrowException_WhenNotExists() {
-        // Given
-        when(trainerRepo.findById(anyLong())).thenReturn(Optional.empty());
-
-        // When & Then
-        assertThrows(
-                NoSuchElementException.class,
-                () -> trainerService.findById(testTrainer.getUserId()),
-                "Trainer with id=1 was not found"
-        );
-        verify(trainerRepo, times(1)).findById(idArgumentCaptor.capture());
-    }
-
-    @Test
     @DisplayName("save should generate username and password, then save trainer")
     void save_ShouldGenerateUsernameAndPasswordAndSaveTrainer() {
         // Given
@@ -148,7 +133,7 @@ class TrainerServiceImplTest extends UnitTestBase {
         // When & Then
         assertThrows(
                 NoSuchElementException.class,
-                () -> trainerService.update(testTrainer.getUserId(), new Trainer()),
+                () -> trainerService.update(new Trainer()),
                 "Trainer with id=1 not found, updating failed"
         );
 
@@ -165,7 +150,7 @@ class TrainerServiceImplTest extends UnitTestBase {
         when(trainerRepo.update(any(Trainer.class))).thenReturn(testTrainer);
 
         // When
-        var result = trainerService.update(testTrainer.getUserId(), new Trainer());
+        var result = trainerService.update(new Trainer());
 
         // Then
         assertEquals(testTrainer, result);

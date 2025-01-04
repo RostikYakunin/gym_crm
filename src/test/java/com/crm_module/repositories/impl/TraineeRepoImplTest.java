@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ class TraineeRepoImplTest extends UnitTestBase {
     void setUp() {
         testTrainee = Trainee.builder()
                 .userId(1L)
-                .dateOfBirth("01.01.2000")
+                .dateOfBirth(LocalDate.of(1998, 11, 23))
                 .username("testUsername")
                 .address("Some street")
                 .build();
@@ -38,25 +39,6 @@ class TraineeRepoImplTest extends UnitTestBase {
     @AfterEach
     void destroy() {
         testTrainee = null;
-    }
-
-    @Test
-    @DisplayName("generateId should generate ids sequentially")
-    void generateId_shouldReturnSequentialIds() {
-        // Given
-        long firstExpectedId = 1;
-        long secondExpectedId = 2;
-        long thirdExpectedId = 3;
-
-        // When
-        long firstGeneratedId = traineeRepo.generateId();
-        long secondGeneratedId = traineeRepo.generateId();
-        long thirdGeneratedId = traineeRepo.generateId();
-
-        // Then
-        assertEquals(firstExpectedId, firstGeneratedId);
-        assertEquals(secondExpectedId, secondGeneratedId);
-        assertEquals(thirdExpectedId, thirdGeneratedId);
     }
 
     @Test
@@ -113,7 +95,7 @@ class TraineeRepoImplTest extends UnitTestBase {
         when(mockDatabase.put(anyLong(), any(Trainee.class))).thenReturn(testTrainee);
 
         // When
-        Trainee result = traineeRepo.update(new Trainee());
+        var result = traineeRepo.update(testTrainee);
 
         // Then
         assertEquals(testTrainee, result);
@@ -124,18 +106,13 @@ class TraineeRepoImplTest extends UnitTestBase {
     }
 
     @Test
-    @DisplayName("Should remove Trainee and return true when successful")
-    void deleteById_ShouldRemoveTraineeAndReturnTrue_WhenSuccessful() {
-        // Given
-        when(mockDatabase.containsKey(anyLong())).thenReturn(false);
-
-        // When
-        boolean result = traineeRepo.deleteById(1L);
+    @DisplayName("Should remove Trainee")
+    void deleteById_ShouldRemoveTrainee() {
+        // Given - When
+        traineeRepo.delete(new Trainee());
 
         // Then
-        assertTrue(result);
         verify(mockDatabase, times(1)).remove(idArgumentCaptor.capture());
-        verify(mockDatabase, times(1)).containsKey(idArgumentCaptor.capture());
     }
 
     @Test

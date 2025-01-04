@@ -21,13 +21,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer findById(long id) {
         log.info("Searching for trainer with id={}", id);
-        return trainerRepo.findById(id)
-                .orElseThrow(
-                        () -> {
-                            log.error("Trainer with id=" + id + " was not found");
-                            return new NoSuchElementException("Trainer with id=" + id + " was not found");
-                        }
-                );
+        return trainerRepo.findById(id).orElse(null);
     }
 
     @Override
@@ -64,20 +58,21 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer update(long id, Trainer trainer) {
-        log.info("Starting update process for trainer with id={}", id);
+    public Trainer update(Trainer trainer) {
+        var trainerUserId = trainer.getUserId();
+        log.info("Starting update process for trainer with id={}", trainerUserId);
 
-        var existingTrainer = trainerRepo.findById(id)
+        var existingTrainer = trainerRepo.findById(trainerUserId)
                 .orElseThrow(() -> {
-                    log.error("Trainer with id={} not found, updating failed", id);
-                    return new NoSuchElementException("trainer with id=" + id + " not found");
+                    log.error("Trainer with id={} not found, updating failed", trainerUserId);
+                    return new NoSuchElementException("trainer with id=" + trainerUserId + " not found");
                 });
 
         log.info("Starting updating trainer... ");
         trainerMapper.updateTrainer(existingTrainer, trainer);
 
         var updatedTrainer = trainerRepo.update(existingTrainer);
-        log.info("Trainer with id={} was successfully updated", id);
+        log.info("Trainer with id={} was successfully updated", trainerUserId);
 
         return updatedTrainer;
     }

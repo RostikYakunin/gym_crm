@@ -28,7 +28,7 @@ public class UserUtils {
             counter++;
         }
 
-        log.info("Unique username was created-" + uniqueUsername);
+        log.info("Unique username was created: " + uniqueUsername);
         return uniqueUsername;
     }
 

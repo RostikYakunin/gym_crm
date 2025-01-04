@@ -30,7 +30,8 @@ public class TrainingRepoImpl implements TrainingRepo {
     @Override
     public Training save(Training training) {
         log.debug("Trying to save training with id=" + training.getId());
-        return trainingDataBase.put(training.getId(), training);
+        trainingDataBase.put(training.getId(), training);
+        return training;
     }
 
     @Override
@@ -40,12 +41,12 @@ public class TrainingRepoImpl implements TrainingRepo {
     }
 
     @Override
-    public boolean deleteById(long id) {
-        log.debug("Trying to remove training with id=" + id);
-        trainingDataBase.remove(id);
+    public void delete(Training training) {
+        var trainingId = training.getId();
+        log.debug("Trying to remove training with id=" + trainingId);
 
-        log.debug("Training with id=" + id + " was successfully removed");
-        return !trainingDataBase.containsKey(id);
+        trainingDataBase.remove(trainingId);
+        log.debug("Training with id=" + trainingId + " was successfully removed");
     }
 
     @Override

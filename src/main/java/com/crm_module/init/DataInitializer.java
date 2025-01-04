@@ -4,6 +4,9 @@ import com.crm_module.config.AppConfig;
 import com.crm_module.models.training.Training;
 import com.crm_module.models.users.Trainee;
 import com.crm_module.models.users.Trainer;
+import com.crm_module.services.TraineeService;
+import com.crm_module.services.TrainerService;
+import com.crm_module.services.TrainingService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -16,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -33,9 +35,9 @@ public class DataInitializer {
     @Value("${data.file.training_data}")
     private String trainingDataFilePath;
 
-    private final Map<Long, Trainee> traineeDataBase;
-    private final Map<Long, Trainer> trainerDataBase;
-    private final Map<Long, Training> trainingDataBase;
+    private final TraineeService traineeService;
+    private final TrainerService trainerService;
+    private final TrainingService trainingService;
     private final ObjectMapper objectMapper;
 
     @PostConstruct
@@ -59,17 +61,20 @@ public class DataInitializer {
     }
 
     private void initializeTraineeData() throws Exception {
-        List<Trainee> trainees = objectMapper.readValue(new File(traineeDataFilePath), new TypeReference<>() {});
-        trainees.forEach(trainee -> traineeDataBase.put(trainee.getUserId(), trainee));
+        List<Trainee> trainees = objectMapper.readValue(new File(traineeDataFilePath), new TypeReference<>() {
+        });
+        trainees.forEach(traineeService::save);
     }
 
     private void initializeTrainerData() throws Exception {
-        List<Trainer> trainers = objectMapper.readValue(new File(trainerDataFilePath), new TypeReference<>() {});
-        trainers.forEach(trainer -> trainerDataBase.put(trainer.getUserId(), trainer));
+        List<Trainer> trainers = objectMapper.readValue(new File(trainerDataFilePath), new TypeReference<>() {
+        });
+        trainers.forEach(trainerService::save);
     }
 
     private void initializeTrainingData() throws Exception {
-        List<Training> trainings = objectMapper.readValue(new File(trainingDataFilePath), new TypeReference<>() {});
-        trainings.forEach(training -> trainingDataBase.put(training.getId(), training));
+        List<Training> trainings = objectMapper.readValue(new File(trainingDataFilePath), new TypeReference<>() {
+        });
+        trainings.forEach(trainingService::save);
     }
 }

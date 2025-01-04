@@ -31,7 +31,8 @@ public class TraineeRepoImpl implements TraineeRepo {
     @Override
     public Trainee save(Trainee trainee) {
         log.debug("Trying to save trainee with id=" + trainee.getUserId());
-        return traineeDataBase.put(trainee.getUserId(), trainee);
+        traineeDataBase.put(trainee.getUserId(), trainee);
+        return trainee;
     }
 
     @Override
@@ -41,12 +42,12 @@ public class TraineeRepoImpl implements TraineeRepo {
     }
 
     @Override
-    public boolean deleteById(long id) {
-        log.debug("Trying to remove trainee with id=" + id);
-        traineeDataBase.remove(id);
+    public void delete(Trainee trainee) {
+        var traineeUserId = trainee.getUserId();
+        log.debug("Trying to remove trainee with id=" + traineeUserId);
 
-        log.debug("Trainee with id=" + id + " was successfully removed");
-        return !traineeDataBase.containsKey(id);
+        traineeDataBase.remove(traineeUserId);
+        log.debug("Trainee with id=" + traineeUserId + " was successfully removed");
     }
 
     @Override

@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -18,13 +16,7 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public Training findById(long id) {
         log.info("Searching for trainee with id={}", id);
-        return trainingRepo.findById(id)
-                .orElseThrow(
-                        () -> {
-                            log.error("Training with id=" + id + " was not found");
-                            return new NoSuchElementException("Training with id=" + id + " was not found");
-                        }
-                );
+        return trainingRepo.findById(id).orElse(null);
     }
 
     @Override

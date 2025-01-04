@@ -32,7 +32,8 @@ public class TrainerRepoImpl implements TrainerRepo {
     @Override
     public Trainer save(Trainer trainer) {
         log.debug("Trying to save trainer by id=" + trainer.getUserId());
-        return trainerDataBase.put(trainer.getUserId(), trainer);
+        trainerDataBase.put(trainer.getUserId(), trainer);
+        return trainer;
     }
 
     @Override
@@ -42,12 +43,12 @@ public class TrainerRepoImpl implements TrainerRepo {
     }
 
     @Override
-    public boolean deleteById(long id) {
-        log.debug("Trying to remove trainer by id=" + id);
-        trainerDataBase.remove(id);
+    public void delete(Trainer trainer) {
+        var trainerId = trainer.getUserId();
+        log.debug("Trying to remove trainer by id=" + trainerId);
 
-        log.debug("Trainer with id=" + id + " was successfully removed");
-        return !trainerDataBase.containsKey(id);
+        trainerDataBase.remove(trainerId);
+        log.debug("Trainer with id=" + trainerId + " was successfully removed");
     }
 
     @Override

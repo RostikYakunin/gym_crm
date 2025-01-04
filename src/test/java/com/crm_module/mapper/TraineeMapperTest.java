@@ -1,69 +1,68 @@
 package com.crm_module.mapper;
 
 import com.crm_module.models.users.Trainee;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TraineeMapperTest {
     private TraineeMapper traineeMapper;
+    private Trainee testTrainee;
 
     @BeforeEach
     void setUp() {
         traineeMapper = Mappers.getMapper(TraineeMapper.class);
+        testTrainee = Trainee.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .username("John.Doe")
+                .password("12345")
+                .isActive(true)
+                .build();
+    }
+
+    @AfterEach
+    void destroy() {
+        traineeMapper = null;
+        testTrainee = null;
     }
 
     @Test
     @DisplayName("Should be updated only non null fields when exists updated fields")
     void givenUpdatedTrainee_whenUpdateTrainee_thenOnlyNonNullFieldsShouldBeUpdated() {
         // Given
-        var existingTrainee = Trainee.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .username("johndoe")
-                .password("12345")
-                .isActive(true)
-                .build();
-
         var updatedTrainee = Trainee.builder()
                 .firstName("Jane")
-                .username("janedoe")
+                .username("Jane.Doe")
                 .build();
 
         // When
-        traineeMapper.updateTrainee(existingTrainee, updatedTrainee);
+        traineeMapper.updateTrainee(testTrainee, updatedTrainee);
 
         // Then
-        assertEquals("Jane", existingTrainee.getFirstName());
-        assertEquals("Doe", existingTrainee.getLastName());
-        assertEquals("janedoe", existingTrainee.getUsername());
-        assertEquals("12345", existingTrainee.getPassword());
+        assertEquals("Jane", testTrainee.getFirstName());
+        assertEquals("Doe", testTrainee.getLastName());
+        assertEquals("Jane.Doe", testTrainee.getUsername());
+        assertEquals("12345", testTrainee.getPassword());
     }
 
     @Test
     @DisplayName("Should not update any fields when all fields are null")
     void givenNullUpdatedTrainee_whenUpdateTrainee_thenNoFieldsShouldBeUpdated() {
         // Given
-        var existingTrainee = Trainee.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .username("johndoe")
-                .password("12345")
-                .isActive(true)
-                .build();
-
         var updatedTrainee = new Trainee();
 
         // When
-        traineeMapper.updateTrainee(existingTrainee, updatedTrainee);
+        traineeMapper.updateTrainee(testTrainee, updatedTrainee);
 
         // Then
-        assertEquals("John", existingTrainee.getFirstName());
-        assertEquals("Doe", existingTrainee.getLastName());
-        assertEquals("johndoe", existingTrainee.getUsername());
-        assertEquals("12345", existingTrainee.getPassword());
+        assertEquals("John", testTrainee.getFirstName());
+        assertEquals("Doe", testTrainee.getLastName());
+        assertEquals("John.Doe", testTrainee.getUsername());
+        assertEquals("12345", testTrainee.getPassword());
     }
 }

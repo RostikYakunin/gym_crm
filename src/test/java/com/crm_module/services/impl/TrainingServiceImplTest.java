@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +32,7 @@ class TrainingServiceImplTest extends UnitTestBase {
     }
 
     @AfterEach
-    void destroy(){
+    void destroy() {
         testTraining = null;
     }
 
@@ -48,22 +47,6 @@ class TrainingServiceImplTest extends UnitTestBase {
 
         // Then
         assertEquals(testTraining, result);
-        verify(trainingRepo, times(1)).findById(testTraining.getId());
-    }
-
-    @Test
-    @DisplayName("findById should throw exception when training does not exist")
-    void findById_ShouldThrowException_WhenNotExists() {
-        // Given
-        when(trainingRepo.findById(testTraining.getId())).thenReturn(Optional.empty());
-
-        // When & Then
-        assertThrows(
-                NoSuchElementException.class,
-                () -> trainingService.findById(testTraining.getId()),
-                "Training with id=1 was not found"
-        );
-
         verify(trainingRepo, times(1)).findById(testTraining.getId());
     }
 

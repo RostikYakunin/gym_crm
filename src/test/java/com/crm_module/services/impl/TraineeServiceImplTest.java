@@ -8,8 +8,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -43,7 +41,7 @@ class TraineeServiceImplTest extends UnitTestBase {
     }
 
     @AfterEach
-    void destroy(){
+    void destroy() {
         testTrainee = null;
     }
 
@@ -62,23 +60,8 @@ class TraineeServiceImplTest extends UnitTestBase {
     }
 
     @Test
-    @DisplayName("findById should throw exception when trainee does not exist")
-    void findById_ShouldThrowException_WhenNotExists() {
-        // Given
-        when(traineeRepo.findById(anyLong())).thenReturn(Optional.empty());
-
-        // When & Then
-        assertThrows(
-                NoSuchElementException.class,
-                () -> traineeService.findById(testTrainee.getUserId()),
-                "Trainee with id=1 was not found"
-        );
-        verify(traineeRepo, times(1)).findById(idArgumentCaptor.capture());
-    }
-
-    @Test
     @DisplayName("save should save trainee by firstname and lastname")
-    void save_ShouldSaveTraineeUsingFirstnameAndLastName(){
+    void save_ShouldSaveTraineeUsingFirstnameAndLastName() {
         // Given
         String expectedUserName = "John.Doe";
 
@@ -144,50 +127,16 @@ class TraineeServiceImplTest extends UnitTestBase {
 
     @Test
     @DisplayName("deleteById should return true when trainee was successfully deleted")
-    void deleteById_ShouldReturnTrue_WhenSuccessfullyDeleted() {
+    void deleteById_ShouldDelete_WhenTraineeExists() {
         // Given
         when(traineeRepo.isExistsById(anyLong())).thenReturn(true);
-        when(traineeRepo.deleteById(anyLong())).thenReturn(true);
-        doNothing().when(traineeMapper).updateTrainee(any(Trainee.class), any(Trainee.class));
+        doNothing().when(traineeRepo).delete(any(Trainee.class));
 
         // When
-        boolean result = traineeService.deleteById(testTrainee.getUserId());
+        traineeService.delete(new Trainee());
 
         // Then
-        assertTrue(result);
-        verify(traineeRepo, times(1)).deleteById(idArgumentCaptor.capture());
-    }
-
-    @Test
-    @DisplayName("deleteById should return false when trainee was not successfully deleted")
-    void deleteById_ShouldReturnFalse_WhenWasNotSuccessfullyDeleted() {
-        // Given
-        when(traineeRepo.isExistsById(anyLong())).thenReturn(true);
-        when(traineeRepo.deleteById(anyLong())).thenReturn(false);
-        doNothing().when(traineeMapper).updateTrainee(any(Trainee.class), any(Trainee.class));
-
-        // When
-        boolean result = traineeService.deleteById(testTrainee.getUserId());
-
-        // Then
-        assertFalse(result);
-        verify(traineeRepo, times(1)).deleteById(idArgumentCaptor.capture());
-    }
-
-    @Test
-    @DisplayName("delete should return true when trainee was successfully deleted")
-    void delete_ShouldReturnTrue_WhenSuccessfullyDeleted() {
-        // Given
-        when(traineeRepo.isExistsById(anyLong())).thenReturn(true);
-        when(traineeRepo.deleteById(anyLong())).thenReturn(true);
-        doNothing().when(traineeMapper).updateTrainee(any(Trainee.class), any(Trainee.class));
-
-        // When
-        boolean result = traineeService.delete(testTrainee);
-
-        // Then
-        assertTrue(result);
-        verify(traineeRepo, times(1)).deleteById(idArgumentCaptor.capture());
+        verify(traineeRepo, times(1)).delete(traineeArgumentCaptor.capture());
     }
 
     @Test
@@ -199,11 +148,11 @@ class TraineeServiceImplTest extends UnitTestBase {
         // When - Then
         assertThrows(
                 NoSuchElementException.class,
-                () -> traineeService.deleteById(testTrainee.getUserId()),
+                () -> traineeService.delete(testTrainee),
                 "Trainee with id=1 not found"
         );
 
-        verify(traineeRepo, never()).deleteById(idArgumentCaptor.capture());
+        verify(traineeRepo, never()).delete(traineeArgumentCaptor.capture());
     }
 
     @Test
@@ -215,7 +164,7 @@ class TraineeServiceImplTest extends UnitTestBase {
         doNothing().when(traineeMapper).updateTrainee(any(Trainee.class), any(Trainee.class));
 
         // When
-        var result = traineeService.update(1L, new Trainee());
+        var result = traineeService.update(new Trainee());
 
         // Then
         assertNotNull(result);
@@ -233,9 +182,9 @@ class TraineeServiceImplTest extends UnitTestBase {
         // When - Then
         assertThrows(
                 NoSuchElementException.class,
-                () -> traineeService.update(1L, new Trainee()),
+                () -> traineeService.update(new Trainee()),
                 "Trainee with id=1 not found"
-        ) ;
+        );
 
         verify(traineeRepo, never()).update(traineeArgumentCaptor.capture());
     }

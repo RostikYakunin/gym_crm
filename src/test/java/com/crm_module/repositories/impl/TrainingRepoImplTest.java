@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,25 +33,6 @@ class TrainingRepoImplTest extends UnitTestBase {
     @AfterEach
     void tearDown() {
         testTraining = null;
-    }
-
-    @Test
-    @DisplayName("generateId should generate ids sequentially")
-    void generateId_shouldReturnSequentialIds() {
-        // Given
-        long firstExpectedId = 1;
-        long secondExpectedId = 2;
-        long thirdExpectedId = 3;
-
-        // When
-        long firstGeneratedId = trainingRepo.generateId();
-        long secondGeneratedId = trainingRepo.generateId();
-        long thirdGeneratedId = trainingRepo.generateId();
-
-        // Then
-        assertEquals(firstExpectedId, firstGeneratedId);
-        assertEquals(secondExpectedId, secondGeneratedId);
-        assertEquals(thirdExpectedId, thirdGeneratedId);
     }
 
     @Test
@@ -88,13 +68,13 @@ class TrainingRepoImplTest extends UnitTestBase {
     @DisplayName("save should save the training")
     void save_ShouldSaveTraining() {
         // Given
-        when(mockDatabase.put(anyLong(), any(Training.class))).thenReturn(null);
+        when(mockDatabase.put(anyLong(), any(Training.class))).thenReturn(testTraining);
 
         // When
         var result = trainingRepo.save(testTraining);
 
         // Then
-        assertNull(result);
+        assertNotNull(result);
         verify(mockDatabase, times(1)).put(
                 idArgumentCaptor.capture(),
                 trainingArgumentCaptor.capture()
@@ -119,33 +99,13 @@ class TrainingRepoImplTest extends UnitTestBase {
     }
 
     @Test
-    @DisplayName("deleteById should remove training and return true when successful")
-    void deleteById_ShouldRemoveTrainingAndReturnTrue_WhenSuccessful() {
-        // Given
-        when(mockDatabase.containsKey(anyLong())).thenReturn(false);
-
-        // When
-        var result = trainingRepo.deleteById(testTraining.getId());
+    @DisplayName("deleteById should remove training")
+    void deleteById_ShouldRemoveTraining() {
+        // Given - When
+        trainingRepo.delete(testTraining);
 
         // Then
-        assertTrue(result);
         verify(mockDatabase, times(1)).remove(idArgumentCaptor.capture());
-        verify(mockDatabase, times(1)).containsKey(idArgumentCaptor.capture());
-    }
-
-    @Test
-    @DisplayName("deleteById should return false when training still exists")
-    void deleteById_ShouldReturnFalse_WhenTrainingStillExists() {
-        // Given
-        when(mockDatabase.containsKey(anyLong())).thenReturn(true);
-
-        // When
-        var result = trainingRepo.deleteById(testTraining.getId());
-
-        // Then
-        assertFalse(result);
-        verify(mockDatabase, times(1)).remove(idArgumentCaptor.capture());
-        verify(mockDatabase, times(1)).containsKey(idArgumentCaptor.capture());
     }
 
     @Test

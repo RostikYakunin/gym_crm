@@ -9,7 +9,7 @@ public interface TrainerService {
 
     Trainer save(Trainer trainer);
 
-    Trainer update(long id, Trainer trainer);
+    Trainer update(Trainer trainer);
 
     boolean isExistsById(long id);
 }

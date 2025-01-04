@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -13,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Trainee extends User {
     private long userId;
-    private String dateOfBirth;
+    private LocalDate dateOfBirth;
     private String address;
 }
 

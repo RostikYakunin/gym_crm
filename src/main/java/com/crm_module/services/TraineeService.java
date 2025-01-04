@@ -7,10 +7,9 @@ public interface TraineeService {
 
     Trainee save(Trainee trainee);
 
-    Trainee update(long id, Trainee trainee);
+    Trainee update(Trainee trainee);
 
-    boolean deleteById (long id);
-    boolean delete (Trainee trainee);
+    void delete(Trainee trainee);
 
     boolean isExistsById(long id);
 }

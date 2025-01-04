@@ -39,25 +39,6 @@ class TrainerRepoImplTest extends UnitTestBase {
     }
 
     @Test
-    @DisplayName("generateId should generate ids sequentially")
-    void generateId_shouldReturnSequentialIds() {
-        // Given
-        long firstExpectedId = 1;
-        long secondExpectedId = 2;
-        long thirdExpectedId = 3;
-
-        // When
-        long firstGeneratedId = trainerRepo.generateId();
-        long secondGeneratedId = trainerRepo.generateId();
-        long thirdGeneratedId = trainerRepo.generateId();
-
-        // Then
-        assertEquals(firstExpectedId, firstGeneratedId);
-        assertEquals(secondExpectedId, secondGeneratedId);
-        assertEquals(thirdExpectedId, thirdGeneratedId);
-    }
-
-    @Test
     @DisplayName("findById should return trainer when exists")
     void findById_ShouldReturnTrainer_WhenExists() {
         // Given
@@ -90,13 +71,13 @@ class TrainerRepoImplTest extends UnitTestBase {
     @DisplayName("save should save the trainer")
     void save_ShouldSaveTrainer() {
         // Given
-        when(mockDatabase.put(anyLong(), any(Trainer.class))).thenReturn(null);
+        when(mockDatabase.put(anyLong(), any(Trainer.class))).thenReturn(testTrainer);
 
         // When
         var result = trainerRepo.save(testTrainer);
 
         // Then
-        assertNull(result);
+        assertNotNull(result);
         verify(mockDatabase, times(1)).put(
                 idArgumentCaptor.capture(),
                 trainerArgumentCaptor.capture()
@@ -121,18 +102,13 @@ class TrainerRepoImplTest extends UnitTestBase {
     }
 
     @Test
-    @DisplayName("deleteById should remove trainer and return true when successful")
-    void deleteById_ShouldRemoveTrainerAndReturnTrue_WhenSuccessful() {
-        // Given
-        when(mockDatabase.containsKey(anyLong())).thenReturn(false);
-
-        // When
-        var result = trainerRepo.deleteById(testTrainer.getUserId());
+    @DisplayName("deleteById should remove trainer ")
+    void deleteById_ShouldRemoveTrainer() {
+        // Given - When
+        trainerRepo.delete(testTrainer);
 
         // Then
-        assertTrue(result);
         verify(mockDatabase, times(1)).remove(idArgumentCaptor.capture());
-        verify(mockDatabase, times(1)).containsKey(idArgumentCaptor.capture());
     }
 
     @Test

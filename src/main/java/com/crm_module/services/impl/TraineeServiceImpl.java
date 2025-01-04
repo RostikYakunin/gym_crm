@@ -21,13 +21,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public Trainee findById(long id) {
         log.info("Searching for trainee with id={}", id);
-        return traineeRepo.findById(id)
-                .orElseThrow(
-                        () -> {
-                            log.error("Trainee with id=" + id + " was not found");
-                            return new NoSuchElementException("Trainee with id=" + id + " was not found");
-                        }
-                );
+        return traineeRepo.findById(id).orElse(null);
     }
 
     public Trainee save(String firstName, String lastName) {
@@ -56,54 +50,44 @@ public class TraineeServiceImpl implements TraineeService {
         trainee.setPassword(generatedPassword);
         trainee.setActive(true);
 
-        Trainee savedTrainee = traineeRepo.save(trainee);
+        var savedTrainee = traineeRepo.save(trainee);
         log.info("Trainee with id={} was successfully saved", savedTrainee.getUserId());
 
         return savedTrainee;
     }
 
     @Override
-    public Trainee update(long id, Trainee trainee) {
-        log.info("Starting update process for trainee with id={}", id);
+    public Trainee update(Trainee trainee) {
+        var traineeId = trainee.getUserId();
+        log.info("Starting update process for trainee with id={}", traineeId);
 
-        Trainee existingTrainee = traineeRepo.findById(id)
+        var existingTrainee = traineeRepo.findById(traineeId)
                 .orElseThrow(() -> {
-                    log.error("Trainee with id={} not found, update failed", id);
-                    return new NoSuchElementException("Trainee with id=" + id + " not found");
+                    log.error("Trainee with id={} not found, update failed", traineeId);
+                    return new NoSuchElementException("Trainee with id=" + traineeId + " not found");
                 });
 
         log.info("Starting updating trainee... ");
         traineeMapper.updateTrainee(existingTrainee, trainee);
 
-        Trainee updatedTrainee = traineeRepo.update(existingTrainee);
-        log.info("Trainee with id={} was successfully updated", id);
+        var updatedTrainee = traineeRepo.update(existingTrainee);
+        log.info("Trainee with id={} was successfully updated", traineeId);
 
         return updatedTrainee;
     }
 
     @Override
-    public boolean deleteById(long id) {
-        log.info("Attempting to delete trainee with id: {}", id);
+    public void delete(Trainee trainee) {
+        var traineeId = trainee.getUserId();
+        log.info("Attempting to delete trainee with id: {}", traineeId);
 
-        if (!traineeRepo.isExistsById(id)) {
-            log.error("Trainee with id={} not found, deletion failed", id);
-            throw new NoSuchElementException("Trainee with id=" + id + " not found");
+        if (!traineeRepo.isExistsById(traineeId)) {
+            log.error("Trainee with id={} not found, deletion failed", traineeId);
+            throw new NoSuchElementException("Trainee with id=" + traineeId + " not found");
         }
 
-        var isDeleted = traineeRepo.deleteById(id);
-        if (isDeleted) {
-            log.info("Trainee with id={} was successfully deleted", id);
-        } else {
-            log.error("Failed to delete trainee with id={}", id);
-        }
-
-        return isDeleted;
-    }
-
-    @Override
-    public boolean delete(Trainee trainee) {
-        log.info("Starting deleting trainee... ");
-        return deleteById(trainee.getUserId());
+        traineeRepo.delete(trainee);
+        log.info("Trainee with id={} was successfully deleted", traineeId);
     }
 
     @Override
