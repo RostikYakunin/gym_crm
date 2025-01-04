@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-group 'com.crm_module'
+group 'com.crm'
 version '1.0-SNAPSHOT'
 
 repositories {
