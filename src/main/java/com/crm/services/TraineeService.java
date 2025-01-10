@@ -7,6 +7,8 @@ import java.time.LocalDate;
 public interface TraineeService {
     Trainee findById(long id);
 
+    Trainee findByUsername(String username);
+
     Trainee save(String firstName, String lastName, String address, LocalDate dateOfBirth);
 
     Trainee save(Trainee trainee);
@@ -15,4 +17,9 @@ public interface TraineeService {
 
     void delete(Trainee trainee);
 
+    void deleteByUsername(String username);
+
+    Trainee changePassword(Trainee trainee, String password);
+
+    Trainee toggleActiveStatus(long traineeId);
 }

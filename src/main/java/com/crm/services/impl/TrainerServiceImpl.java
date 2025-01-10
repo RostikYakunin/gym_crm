@@ -24,6 +24,12 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    public Trainer findByUsername(String username) {
+        log.info("Searching for trainer with username={}", username);
+        return trainerRepo.findByUserName(username).orElse(null);
+    }
+
+    @Override
     public Trainer save(String firstName, String lastName, TrainingType specialization) {
         log.info("Starting saving trainer using first and last names... ");
 
@@ -38,7 +44,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer save(Trainer trainer) {
-        log.info("Starting saving trainer {}", trainer);
+        log.info("Starting saving trainer with first name: {}", trainer.getFirstName());
 
         var uniqueUsername = UserUtils.generateUniqueUsername(
                 trainer,
@@ -48,7 +54,7 @@ public class TrainerServiceImpl implements TrainerService {
 
         trainer.setUsername(uniqueUsername);
         trainer.setPassword(generatedPassword);
-        trainer.setActive(true);
+        trainer.setIsActive(true);
 
         var savedTrainer = trainerRepo.save(trainer);
         log.info("Trainer with id={} was successfully saved", savedTrainer.getId());
@@ -58,19 +64,49 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer update(Trainer trainer) {
-        var trainerUserId = trainer.getId();
-        log.info("Starting update process for trainer with id={}", trainerUserId);
+        var trainerId = trainer.getId();
+        log.info("Started updating process for trainer with id={}", trainerId);
 
-        var existingTrainer = trainerRepo.findById(trainerUserId)
-                .orElseThrow(() -> {
-                    log.error("Trainer with id={} not found, updating failed", trainerUserId);
-                    return new NoSuchElementException("trainer with id=" + trainerUserId + " not found");
-                });
+        boolean existsById = trainerRepo.isExistsById(trainerId);
+        if (!existsById) {
+            log.error("Trainer with id={} not found, update failed", trainerId);
+            throw new NoSuchElementException("Trainer with id=" + trainerId + " not found");
+        }
 
         log.info("Starting updating trainer... ");
-        var updatedTrainer = trainerRepo.update(existingTrainer);
-        log.info("Trainer with id={} was successfully updated", trainerUserId);
+        var updatedTrainer = trainerRepo.update(trainer);
+        log.info("Trainer with id={} was successfully updated", trainerId);
 
+        return updatedTrainer;
+    }
+
+    @Override
+    public Trainer changePassword(Trainer trainer, String password) {
+        log.info("Starting changing password for trainee... ");
+
+        trainer.setPassword(password);
+        var updatedTrainer = update(trainer);
+
+        log.info("Password`s changing successfully completed...");
+        return updatedTrainer;
+    }
+
+    @Override
+    public Trainer toggleActiveStatus(long trainerId) {
+        log.info("Starting changing status for trainer with id=" + trainerId);
+        var foundTrainer = trainerRepo.findById(trainerId)
+                .orElseThrow(
+                        () -> {
+                            log.error("Trainer with id={} not found, deletion failed", trainerId);
+                            throw new NoSuchElementException("Trainer with id=" + trainerId + " not found");
+                        }
+                );
+
+        log.info("Changing status for trainer with id={} from {} to {}", trainerId, foundTrainer.getIsActive(), !foundTrainer.getIsActive());
+        foundTrainer.setIsActive(!foundTrainer.getIsActive());
+        var updatedTrainer = trainerRepo.update(foundTrainer);
+
+        log.info("Status changing successfully completed...");
         return updatedTrainer;
     }
 }

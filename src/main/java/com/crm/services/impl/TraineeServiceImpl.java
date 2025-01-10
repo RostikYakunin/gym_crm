@@ -24,6 +24,12 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    public Trainee findByUsername(String username) {
+        log.info("Searching for trainee with username={}", username);
+        return traineeRepo.findByUserName(username).orElse(null);
+    }
+
+    @Override
     public Trainee save(String firstName, String lastName, String address, LocalDate dateOfBirth) {
         log.info("Starting saving trainee using first and last names... ");
 
@@ -39,7 +45,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee save(Trainee trainee) {
-        log.info("Saving trainee: {}", trainee.getFirstName());
+        log.info("Started saving trainee with first name: {}", trainee.getFirstName());
 
         var uniqueUsername = UserUtils.generateUniqueUsername(
                 trainee,
@@ -49,7 +55,7 @@ public class TraineeServiceImpl implements TraineeService {
 
         trainee.setUsername(uniqueUsername);
         trainee.setPassword(generatedPassword);
-        trainee.setActive(true);
+        trainee.setIsActive(true);
 
         var savedTrainee = traineeRepo.save(trainee);
         log.info("Trainee with id={} was successfully saved", savedTrainee.getId());
@@ -60,16 +66,16 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public Trainee update(Trainee trainee) {
         var traineeId = trainee.getId();
-        log.info("Starting update process for trainee with id={}", traineeId);
+        log.info("Started updating process for trainee with id={}", traineeId);
 
-        var existingTrainee = traineeRepo.findById(traineeId)
-                .orElseThrow(() -> {
-                    log.error("Trainee with id={} not found, update failed", traineeId);
-                    return new NoSuchElementException("Trainee with id=" + traineeId + " not found");
-                });
+        boolean existsById = traineeRepo.isExistsById(traineeId);
+        if (!existsById) {
+            log.error("Trainee with id={} not found, update failed", traineeId);
+            throw new NoSuchElementException("Trainee with id=" + traineeId + " not found");
+        }
 
         log.info("Starting updating trainee... ");
-        var updatedTrainee = traineeRepo.update(existingTrainee);
+        var updatedTrainee = traineeRepo.update(trainee);
         log.info("Trainee with id={} was successfully updated", traineeId);
 
         return updatedTrainee;
@@ -87,5 +93,50 @@ public class TraineeServiceImpl implements TraineeService {
 
         traineeRepo.delete(trainee);
         log.info("Trainee with id={} was successfully deleted", traineeId);
+    }
+
+    @Override
+    public void deleteByUsername(String username) {
+        log.info("Started deleting trainee by username... ");
+        var foundTrainee = traineeRepo.findByUserName(username)
+                .orElseThrow(
+                        () -> {
+                            log.error("Trainee with username={} not found, deletion failed", username);
+                            throw new NoSuchElementException("Trainee with username=" + username + " not found");
+                        }
+                );
+
+        traineeRepo.delete(foundTrainee);
+        log.info("Trainee with username=" + username + " was successfully deleted");
+    }
+
+    @Override
+    public Trainee changePassword(Trainee trainee, String password) {
+        log.info("Starting changing password for trainee... ");
+
+        trainee.setPassword(password);
+        var updatedTrainee = traineeRepo.update(trainee);
+
+        log.info("Password`s changing successfully completed...");
+        return updatedTrainee;
+    }
+
+    @Override
+    public Trainee toggleActiveStatus(long traineeId) {
+        log.info("Starting changing status for trainee with id=" + traineeId);
+        var foundTrainee = traineeRepo.findById(traineeId)
+                .orElseThrow(
+                        () -> {
+                            log.error("Trainee with id={} not found, deletion failed", traineeId);
+                            throw new NoSuchElementException("Trainee with id=" + traineeId + " not found");
+                        }
+                );
+
+        log.info("Changing status for trainer with id={} from {} to {}", traineeId, foundTrainee.getIsActive(), !foundTrainee.getIsActive());
+        foundTrainee.setIsActive(!foundTrainee.getIsActive());
+        var updatedTrainee = traineeRepo.update(foundTrainee);
+
+        log.info("Status changing successfully completed...");
+        return updatedTrainee;
     }
 }

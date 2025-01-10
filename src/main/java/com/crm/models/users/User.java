@@ -17,7 +17,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 public abstract class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private long id;
 
@@ -34,5 +34,5 @@ public abstract class User {
     private String password;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    private Boolean isActive;
 }

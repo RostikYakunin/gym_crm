@@ -23,6 +23,17 @@ public class TraineeRepoImpl implements TraineeRepo {
     }
 
     @Override
+    public Optional<Trainee> findByUserName(String username) {
+        log.debug("Start searching trainee by username... ");
+        String query = "SELECT t FROM Trainee t WHERE t.username= :username";
+        var trainee = (Trainee) entityManager.createQuery(query)
+                .setParameter("username", username)
+                .getSingleResult();
+
+        return Optional.ofNullable(trainee);
+    }
+
+    @Override
     @Transactional
     public Trainee save(Trainee entity) {
         log.debug("Start saving trainee... ");
@@ -51,7 +62,7 @@ public class TraineeRepoImpl implements TraineeRepo {
     @Override
     public boolean isExistsById(long id) {
         log.debug("Start searching trainee with id= " + id);
-        var query = "SELECT COUNT(u) FROM User u WHERE u.id = :id";
+        var query = "SELECT COUNT(t) FROM Trainee t WHERE t.id = :id";
         var count = (Long) entityManager.createQuery(query)
                 .setParameter("id", id)
                 .getSingleResult();
@@ -62,7 +73,7 @@ public class TraineeRepoImpl implements TraineeRepo {
     @Override
     public boolean isUserNameExists(String username) {
         log.debug("Start searching trainee with username= " + username);
-        var query = "SELECT COUNT(u) FROM User u WHERE u.username = :username";
+        var query = "SELECT COUNT(t) FROM Trainee t WHERE t.username = :username";
         var count = (Long) entityManager.createQuery(query)
                 .setParameter("username", username)
                 .getSingleResult();

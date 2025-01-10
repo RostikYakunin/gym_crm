@@ -23,6 +23,17 @@ public class TrainerRepoImpl implements TrainerRepo {
     }
 
     @Override
+    public Optional<Trainer> findByUserName(String username) {
+        log.debug("Start searching trainer by username... ");
+        String query = "SELECT t FROM Trainer t WHERE t.username= :username";
+        var trainer = (Trainer) entityManager.createQuery(query)
+                .setParameter("username", username)
+                .getSingleResult();
+
+        return Optional.ofNullable(trainer);
+    }
+
+    @Override
     @Transactional
     public Trainer save(Trainer entity) {
         log.debug("Start saving trainer... ");
@@ -51,7 +62,7 @@ public class TrainerRepoImpl implements TrainerRepo {
     @Override
     public boolean isExistsById(long id) {
         log.debug("Start searching trainer with id= " + id);
-        var query = "SELECT COUNT(u) FROM User u WHERE u.id = :id";
+        var query = "SELECT COUNT(t) FROM Trainer t WHERE t.id = :id";
         var count = (Long) entityManager.createQuery(query)
                 .setParameter("id", id)
                 .getSingleResult();
@@ -62,7 +73,7 @@ public class TrainerRepoImpl implements TrainerRepo {
     @Override
     public boolean isUserNameExists(String username) {
         log.debug("Start searching trainer with username= " + username);
-        var query = "SELECT COUNT(u) FROM User u WHERE u.username = :username";
+        var query = "SELECT COUNT(t) FROM Trainer t WHERE t.username = :username";
         var count = (Long) entityManager.createQuery(query)
                 .setParameter("username", username)
                 .getSingleResult();

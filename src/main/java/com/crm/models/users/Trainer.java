@@ -2,12 +2,12 @@ package com.crm.models.users;
 
 import com.crm.models.training.TrainingType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -26,6 +26,10 @@ public class Trainer extends User {
     @ManyToOne
     @JoinColumn(name = "training_type_id", nullable = false)
     private TrainingType specialization;
+
+    @ManyToMany(mappedBy = "trainers")
+    @Builder.Default
+    private List<Trainee> trainees = new ArrayList<>();
 
     @Override
     public String toString() {

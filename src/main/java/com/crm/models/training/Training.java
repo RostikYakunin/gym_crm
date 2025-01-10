@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @DynamicUpdate
 public class Training {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "training_id")
     private long id;
 
