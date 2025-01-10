@@ -1,67 +1,72 @@
 package com.crm.repositories.impl;
 
-
 import com.crm.models.users.Trainer;
-import com.crm.models.users.User;
 import com.crm.repositories.TrainerRepo;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
 @Slf4j
 public class TrainerRepoImpl implements TrainerRepo {
-    private static long idCounter = 1;
-    private final Map<Long, Trainer> trainerDataBase;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public Optional<Trainer> findById(long id) {
-        log.debug("Trying to find trainer by id=" + id);
-        return Optional.ofNullable(trainerDataBase.get(id));
+        log.debug("Start searching trainer by id... ");
+        return Optional.ofNullable(entityManager.find(Trainer.class, id));
     }
 
     @Override
-    public Trainer save(Trainer trainer) {
-        trainer.setUserId(generateId());
-        log.debug("Trying to save trainer by id=" + trainer.getUserId());
+    @Transactional
+    public Trainer save(Trainer entity) {
+        log.debug("Start saving trainer... ");
+        if (entity.getId() != 0) {
+            log.debug("Start merging trainer with id= " + entity.getId());
+            return entityManager.merge(entity);
+        }
 
-        trainerDataBase.put(trainer.getUserId(), trainer);
-        return trainer;
-    }
-
-    private long generateId() {
-        return idCounter++;
-    }
-
-    @Override
-    public Trainer update(Trainer trainer) {
-        log.debug("Trying to update trainer by id=" + trainer.getUserId());
-        return trainerDataBase.put(trainer.getUserId(), trainer);
+        log.debug("Start merging trainer... ");
+        entityManager.persist(entity);
+        return entity;
     }
 
     @Override
-    public void delete(Trainer trainer) {
-        log.error("Method delete is not implemented yet... ");
-        throw new NotImplementedException("Method delete is not implemented yet... ");
+    public Trainer update(Trainer entity) {
+        log.debug("Start updating trainer... ");
+        return save(entity);
+    }
+
+    @Override
+    public void delete(Trainer entity) {
+        log.debug("Start deleting trainer... ");
+        entityManager.remove(entity);
     }
 
     @Override
     public boolean isExistsById(long id) {
-        log.debug("Trying to check if exists trainer with id=" + id);
-        return trainerDataBase.containsKey(id);
+        log.debug("Start searching trainer with id= " + id);
+        var query = "SELECT COUNT(u) FROM User u WHERE u.id = :id";
+        var count = (Long) entityManager.createQuery(query)
+                .setParameter("id", id)
+                .getSingleResult();
+
+        return count > 0;
     }
 
     @Override
     public boolean isUserNameExists(String username) {
-        log.debug("Trying to check if trainer with username=" + username + " is existed");
-        return trainerDataBase.values()
-                .stream()
-                .map(User::getUsername)
-                .anyMatch(un -> un.equals(username));
+        log.debug("Start searching trainer with username= " + username);
+        var query = "SELECT COUNT(u) FROM User u WHERE u.username = :username";
+        var count = (Long) entityManager.createQuery(query)
+                .setParameter("username", username)
+                .getSingleResult();
+
+        return count > 0;
     }
 }

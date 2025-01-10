@@ -1,33 +1,26 @@
 package com.crm.models.training;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
-import java.util.Arrays;
-
-@Getter
+@Data
 @AllArgsConstructor
-@Slf4j
-public enum TrainingType {
-    FITNESS(1, "Fitness"),
-    YOGA(2, "Yoga"),
-    ZUMBA(3, "Zumba"),
-    STRETCHING(4, "Stretching"),
-    RESISTANCE(5, "Resistance");
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "training_types")
+@Immutable
+public class TrainingType {
 
-    private final long id;
-    private final String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "training_type_id")
+    private long id;
 
-    public static TrainingType getById(long id) {
-        return Arrays.stream(values())
-                .filter(type -> type.id == id)
-                .findFirst()
-                .orElseThrow(
-                        () -> {
-                            log.error("Cannot find TrainingType with id=" + id);
-                            return new IllegalArgumentException("Unknown id: " + id);
-                        }
-                );
-    }
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
 }

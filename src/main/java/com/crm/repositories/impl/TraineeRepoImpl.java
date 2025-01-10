@@ -1,68 +1,72 @@
 package com.crm.repositories.impl;
 
 import com.crm.models.users.Trainee;
-import com.crm.models.users.User;
 import com.crm.repositories.TraineeRepo;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
 @Slf4j
 public class TraineeRepoImpl implements TraineeRepo {
-    private static long idCounter = 1;
-    private final Map<Long, Trainee> traineeDataBase;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public Optional<Trainee> findById(long id) {
-        log.debug("Trying to find trainee by id=" + id);
-        return Optional.ofNullable(traineeDataBase.get(id));
+        log.debug("Start searching trainee by id... ");
+        return Optional.ofNullable(entityManager.find(Trainee.class, id));
     }
 
     @Override
-    public Trainee save(Trainee trainee) {
-        trainee.setUserId(generateId());
-        log.debug("Trying to save trainee with id=" + trainee.getUserId());
+    @Transactional
+    public Trainee save(Trainee entity) {
+        log.debug("Start saving trainee... ");
+        if (entity.getId() != 0) {
+            log.debug("Start merging training with id= " + entity.getId());
+            return entityManager.merge(entity);
+        }
 
-        traineeDataBase.put(trainee.getUserId(), trainee);
-        return trainee;
-    }
-
-    private long generateId() {
-        return idCounter++;
-    }
-
-    @Override
-    public Trainee update(Trainee trainee) {
-        log.debug("Trying to update trainee with id=" + trainee.getUserId());
-        return traineeDataBase.put(trainee.getUserId(), trainee);
+        log.debug("Start saving new trainee... ");
+        entityManager.persist(entity);
+        return entity;
     }
 
     @Override
-    public void delete(Trainee trainee) {
-        var traineeUserId = trainee.getUserId();
-        log.debug("Trying to remove trainee with id=" + traineeUserId);
+    public Trainee update(Trainee entity) {
+        log.debug("Start updating trainee... ");
+        return save(entity);
+    }
 
-        traineeDataBase.remove(traineeUserId);
-        log.debug("Trainee with id=" + traineeUserId + " was successfully removed");
+    @Override
+    public void delete(Trainee entity) {
+        log.debug("Start deleting trainee... ");
+        entityManager.remove(entity);
     }
 
     @Override
     public boolean isExistsById(long id) {
-        log.debug("Trying to check if exists trainee with id=" + id);
-        return traineeDataBase.containsKey(id);
+        log.debug("Start searching trainee with id= " + id);
+        var query = "SELECT COUNT(u) FROM User u WHERE u.id = :id";
+        var count = (Long) entityManager.createQuery(query)
+                .setParameter("id", id)
+                .getSingleResult();
+
+        return count > 0;
     }
 
     @Override
     public boolean isUserNameExists(String username) {
-        log.debug("Trying to check if trainee with username=" + username + " is existed");
-        return traineeDataBase.values()
-                .stream()
-                .map(User::getUsername)
-                .anyMatch(un -> un.equals(username));
+        log.debug("Start searching trainee with username= " + username);
+        var query = "SELECT COUNT(u) FROM User u WHERE u.username = :username";
+        var count = (Long) entityManager.createQuery(query)
+                .setParameter("username", username)
+                .getSingleResult();
+
+        return count > 0;
     }
 }

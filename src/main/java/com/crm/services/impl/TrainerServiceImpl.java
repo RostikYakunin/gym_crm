@@ -1,6 +1,6 @@
 package com.crm.services.impl;
 
-import com.crm.mapper.TrainerMapper;
+import com.crm.models.training.TrainingType;
 import com.crm.models.users.Trainer;
 import com.crm.repositories.TrainerRepo;
 import com.crm.services.TrainerService;
@@ -16,7 +16,6 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepo trainerRepo;
-    private final TrainerMapper trainerMapper;
 
     @Override
     public Trainer findById(long id) {
@@ -25,7 +24,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer save(String firstName, String lastName, String specialization) {
+    public Trainer save(String firstName, String lastName, TrainingType specialization) {
         log.info("Starting saving trainer using first and last names... ");
 
         var newTrainer = Trainer.builder()
@@ -52,14 +51,14 @@ public class TrainerServiceImpl implements TrainerService {
         trainer.setActive(true);
 
         var savedTrainer = trainerRepo.save(trainer);
-        log.info("Trainer with id={} was successfully saved", savedTrainer.getUserId());
+        log.info("Trainer with id={} was successfully saved", savedTrainer.getId());
 
         return savedTrainer;
     }
 
     @Override
     public Trainer update(Trainer trainer) {
-        var trainerUserId = trainer.getUserId();
+        var trainerUserId = trainer.getId();
         log.info("Starting update process for trainer with id={}", trainerUserId);
 
         var existingTrainer = trainerRepo.findById(trainerUserId)
@@ -69,8 +68,6 @@ public class TrainerServiceImpl implements TrainerService {
                 });
 
         log.info("Starting updating trainer... ");
-        trainerMapper.updateTrainer(existingTrainer, trainer);
-
         var updatedTrainer = trainerRepo.update(existingTrainer);
         log.info("Trainer with id={} was successfully updated", trainerUserId);
 

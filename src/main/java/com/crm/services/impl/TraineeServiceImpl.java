@@ -1,6 +1,5 @@
 package com.crm.services.impl;
 
-import com.crm.mapper.TraineeMapper;
 import com.crm.models.users.Trainee;
 import com.crm.repositories.TraineeRepo;
 import com.crm.services.TraineeService;
@@ -17,7 +16,6 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class TraineeServiceImpl implements TraineeService {
     private final TraineeRepo traineeRepo;
-    private final TraineeMapper traineeMapper;
 
     @Override
     public Trainee findById(long id) {
@@ -54,14 +52,14 @@ public class TraineeServiceImpl implements TraineeService {
         trainee.setActive(true);
 
         var savedTrainee = traineeRepo.save(trainee);
-        log.info("Trainee with id={} was successfully saved", savedTrainee.getUserId());
+        log.info("Trainee with id={} was successfully saved", savedTrainee.getId());
 
         return savedTrainee;
     }
 
     @Override
     public Trainee update(Trainee trainee) {
-        var traineeId = trainee.getUserId();
+        var traineeId = trainee.getId();
         log.info("Starting update process for trainee with id={}", traineeId);
 
         var existingTrainee = traineeRepo.findById(traineeId)
@@ -71,8 +69,6 @@ public class TraineeServiceImpl implements TraineeService {
                 });
 
         log.info("Starting updating trainee... ");
-        traineeMapper.updateTrainee(existingTrainee, trainee);
-
         var updatedTrainee = traineeRepo.update(existingTrainee);
         log.info("Trainee with id={} was successfully updated", traineeId);
 
@@ -81,7 +77,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public void delete(Trainee trainee) {
-        var traineeId = trainee.getUserId();
+        var traineeId = trainee.getId();
         log.info("Attempting to delete trainee with id: {}", traineeId);
 
         if (!traineeRepo.isExistsById(traineeId)) {
