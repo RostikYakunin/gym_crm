@@ -19,7 +19,7 @@ class UserUtilsTest {
         testUser = Trainee.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .userId(1L)
+                .id(1L)
                 .build();
     }
 

@@ -1,7 +1,6 @@
 package com.crm.services.impl;
 
 import com.crm.UnitTestBase;
-import com.crm.mapper.TraineeMapperImpl;
 import com.crm.models.users.Trainee;
 import com.crm.repositories.TraineeRepo;
 import org.junit.jupiter.api.AfterEach;
@@ -22,9 +21,6 @@ class TraineeServiceImplTest extends UnitTestBase {
     @Mock
     private TraineeRepo traineeRepo;
 
-    @Mock
-    private TraineeMapperImpl traineeMapper;
-
     @InjectMocks
     private TraineeServiceImpl traineeService;
 
@@ -33,7 +29,7 @@ class TraineeServiceImplTest extends UnitTestBase {
     @BeforeEach
     void setUp() {
         testTrainee = Trainee.builder()
-                .userId(1L)
+                .id(1L)
                 .firstName("John")
                 .lastName("Doe")
                 .username("John.Doe")
@@ -55,7 +51,7 @@ class TraineeServiceImplTest extends UnitTestBase {
         when(traineeRepo.findById(anyLong())).thenReturn(Optional.of(testTrainee));
 
         // When
-        var result = traineeService.findById(testTrainee.getUserId());
+        var result = traineeService.findById(testTrainee.getId());
 
         // Then
         assertEquals(testTrainee, result);
@@ -136,7 +132,6 @@ class TraineeServiceImplTest extends UnitTestBase {
         // Given
         when(traineeRepo.findById(anyLong())).thenReturn(Optional.of(testTrainee));
         when(traineeRepo.update(any(Trainee.class))).thenReturn(testTrainee);
-        doNothing().when(traineeMapper).updateTrainee(any(Trainee.class), any(Trainee.class));
 
         // When
         var result = traineeService.update(new Trainee());

@@ -29,7 +29,7 @@ class TrainerRepoImplTest extends UnitTestBase {
     @BeforeEach
     void setUp() {
         testTrainer = Trainer.builder()
-                .userId(1L)
+                .id(1L)
                 .username("testTrainer")
                 .build();
     }
@@ -61,11 +61,11 @@ class TrainerRepoImplTest extends UnitTestBase {
         when(mockDatabase.get(anyLong())).thenReturn(null);
 
         // When
-        var result = trainerRepo.findById(testTrainer.getUserId());
+        var result = trainerRepo.findById(testTrainer.getId());
 
         // Then
         assertFalse(result.isPresent());
-        verify(mockDatabase, times(1)).get(testTrainer.getUserId());
+        verify(mockDatabase, times(1)).get(testTrainer.getId());
     }
 
     @Test
@@ -120,7 +120,7 @@ class TrainerRepoImplTest extends UnitTestBase {
         when(mockDatabase.containsKey(anyLong())).thenReturn(true);
 
         // When
-        var result = trainerRepo.isExistsById(testTrainer.getUserId());
+        var result = trainerRepo.isExistsById(testTrainer.getId());
 
         // Then
         assertTrue(result);
@@ -134,7 +134,7 @@ class TrainerRepoImplTest extends UnitTestBase {
         when(mockDatabase.containsKey(anyLong())).thenReturn(false);
 
         // When
-        var result = trainerRepo.isExistsById(testTrainer.getUserId());
+        var result = trainerRepo.isExistsById(testTrainer.getId());
 
         // Then
         assertFalse(result);

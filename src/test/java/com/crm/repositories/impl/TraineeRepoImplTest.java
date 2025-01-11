@@ -29,7 +29,7 @@ class TraineeRepoImplTest extends UnitTestBase {
     @BeforeEach
     void setUp() {
         testTrainee = Trainee.builder()
-                .userId(1L)
+                .id(1L)
                 .dateOfBirth(LocalDate.of(1998, 11, 23))
                 .username("testUsername")
                 .address("Some street")

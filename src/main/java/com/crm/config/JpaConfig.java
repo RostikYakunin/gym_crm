@@ -34,6 +34,8 @@ public class JpaConfig {
     private String userPassword;
     @Value("${jpa.ddl.auto}")
     private String jpaDdl;
+    @Value("${jpa.show-sql}")
+    private boolean showSql;
 
     @Bean
     public DataSource dataSource() {
@@ -56,7 +58,7 @@ public class JpaConfig {
 
         var jpaProperties = new Properties();
         jpaProperties.put("hibernate.hbm2ddl.auto", jpaDdl);
-        jpaProperties.put("hibernate.show_sql", "true");
+        jpaProperties.put("hibernate.show_sql", showSql);
         jpaProperties.put("hibernate.format_sql", "true");
         factory.setJpaProperties(jpaProperties);
 

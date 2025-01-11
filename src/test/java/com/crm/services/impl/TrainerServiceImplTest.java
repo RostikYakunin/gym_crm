@@ -1,7 +1,7 @@
 package com.crm.services.impl;
 
 import com.crm.UnitTestBase;
-import com.crm.mapper.TrainerMapper;
+import com.crm.models.training.TrainingType;
 import com.crm.models.users.Trainer;
 import com.crm.repositories.TrainerRepo;
 import org.junit.jupiter.api.AfterEach;
@@ -20,8 +20,6 @@ import static org.mockito.Mockito.*;
 class TrainerServiceImplTest extends UnitTestBase {
     @Mock
     private TrainerRepo trainerRepo;
-    @Mock
-    private TrainerMapper trainerMapper;
 
     @InjectMocks
     private TrainerServiceImpl trainerService;
@@ -31,11 +29,11 @@ class TrainerServiceImplTest extends UnitTestBase {
     @BeforeEach
     void setUp() {
         testTrainer = Trainer.builder()
-                .userId(1L)
+                .id(1L)
                 .firstName("Alice")
                 .lastName("Smith")
                 .username("Alice.Smith")
-                .specialization("testSpecialization")
+                .specialization(new TrainingType(1, "Fitness"))
                 .password("SomePassword")
                 .build();
     }
@@ -52,7 +50,7 @@ class TrainerServiceImplTest extends UnitTestBase {
         when(trainerRepo.findById(anyLong())).thenReturn(Optional.of(testTrainer));
 
         // When
-        var result = trainerService.findById(testTrainer.getUserId());
+        var result = trainerService.findById(testTrainer.getId());
 
         // Then
         assertEquals(testTrainer, result);
@@ -87,7 +85,7 @@ class TrainerServiceImplTest extends UnitTestBase {
         when(trainerRepo.save(any(Trainer.class))).thenReturn(testTrainer);
 
         // When
-        var result = trainerService.save("Alice", "Smith", "testSpecialization");
+        var result = trainerService.save("Alice", "Smith", new TrainingType(1, "Fitness"));
 
         // Then
         assertEquals(expectedUserName, testTrainer.getUsername());
@@ -119,7 +117,6 @@ class TrainerServiceImplTest extends UnitTestBase {
     void update_ShouldUpdateTrainer_IfExists() {
         // Given
         when(trainerRepo.findById(anyLong())).thenReturn(Optional.of(testTrainer));
-        doNothing().when(trainerMapper).updateTrainer(any(Trainer.class), any(Trainer.class));
         when(trainerRepo.update(any(Trainer.class))).thenReturn(testTrainer);
 
         // When
@@ -128,10 +125,6 @@ class TrainerServiceImplTest extends UnitTestBase {
         // Then
         assertEquals(testTrainer, result);
         verify(trainerRepo, times(1)).findById(idArgumentCaptor.capture());
-        verify(trainerMapper, times(1)).updateTrainer(
-                trainerArgumentCaptor.capture(),
-                trainerArgumentCaptor.capture()
-        );
         verify(trainerRepo, times(1)).update(trainerArgumentCaptor.capture());
     }
 }
